@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CodeTech Internship Certificate</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<!-- export/print libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#f4f7ff,#e9eef7);
+  font-family:'Inter',system-ui;
+}
+
+/* CERTIFICATE */
+.certificate{
+  width:1000px;
+  height:700px;
+  margin:40px auto;
+  position:relative;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.94)),
+    url('img/bg.png') center/cover no-repeat;
+  box-shadow:0 30px 70px rgba(30,58,138,.18);
+  overflow:hidden;
+}
+
+/* FRAME */
+.frame{
+  position:absolute;
+  inset:0;
+  background:url('img/certificate-frame.png') center/contain no-repeat;
+  z-index:2;
+  pointer-events:none;
+}
+
+/* WATERMARK */
+.watermark{
+  position:absolute;
+  inset:0;
+  background:url('img/logo.png') no-repeat;
+  background-size:120px; /* default watermark size; overridden by JS if needed */
+  opacity:.08;
+  filter:grayscale(40%) blur(1px);
+  z-index:1;
+  pointer-events:none;
+}
+
+/* SAFE CONTENT (GRID = PERFECT VERTICAL BALANCE) */
+  .safe-content{
+  position:relative;
+  z-index:3;
+  width:78%;
+  height:100%;
+  margin:0 auto;
+  padding:90px 0 40px; /* keep enough top space, allow footer to be positioned */
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  row-gap:28px;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:8px; /* nudge header logos slightly lower */
+}
+
+.header img{
+  height:64px;
+}
+
+/* TITLE */
+.platform{
+  text-align:center;
+}
+
+/* lift title slightly without moving header logos */
+.platform { transform: translateY(-30px); }
+
+.platform h1{
+  font-family:'Playfair Display',serif;
+  font-size:40px;
+  letter-spacing:3px;
+  color:#1e3a8a;
+  margin:0 0 6px;
+}
+
+.platform h3{
+  margin:0;
+  font-weight:400;
+  color:#475569;
+}
+
+/* CONTENT */
+.content{
+  text-align:center;
+  font-size:15px;
+  line-height:1.25;
+  align-self:center; /* TRUE vertical centering */
+  max-width:680px; /* limit text width to avoid overlapping footer */
+  margin:0 auto;
+  padding:0 18px; /* small side padding for better wrapping */
+}
+
+.name{
+  font-family:'Playfair Display',serif;
+  font-size:42px;
+  font-weight:700;
+  margin:8px 0;
+  color:#07103a;
+}
+
+/* FOOTER */
+  .footer{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:40px; /* base bottom for footer area */
+  height:150px;
+  pointer-events:none;
+}
+
+.sign{
+  width:auto;
+  text-align:center;
+}
+
+.sign img{height:44px; pointer-events:auto; display:block; align-self:center}
+/* left-align the CEO signature image so it lines up with the text */
+.footer .sign:first-child img{ align-self:flex-start; margin-left:6px }
+
+/* position signature blocks absolutely and stack image above label */
+.footer .sign{
+  position:absolute;
+  bottom:40px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-items:center;
+  pointer-events:auto;
+}
+
+/* CEO: left aligned block */
+.footer .sign:first-child{
+  left:34px;
+  align-items:flex-start;
+}
+
+/* Authorized: right aligned block */
+.footer .sign:last-child{
+  right:34px;
+  align-items:flex-end;
+}
+
+/* CEO signature: place near bottom-left corner */
+.footer .sign:first-child{
+  position:absolute;
+  left:4px; /* move CEO block very close to left edge */
+  bottom:72px; /* move signatures up more */
+  width:200px;
+  text-align:left;
+  pointer-events:auto;
+}
+
+/* Authorized signature: place near bottom-right corner */
+.footer .sign:last-child{
+  position:absolute;
+  right:20px;
+  bottom:72px; /* move signatures up more */
+  width:200px;
+  text-align:right;
+  pointer-events:auto;
+}
+
+.sign p{
+  margin-top:6px;
+  font-size:14px;
+  color:#334155;
+}
+
+/* QR */
+.qr-box{
+  width:150px;
+  text-align:center;
+}
+
+#qrcode canvas{
+  width:96px!important;
+  height:96px!important;
+  background:#fff;
+  box-shadow:0 6px 14px rgba(0,0,0,.12);
+  image-rendering:pixelated;
+}
+
+.cert-id{
+  margin-top:4px;
+  font-size:12px;
+  /* allow wrapping so ID can break into two lines if needed for aesthetics */
+  white-space:normal;
+}
+
+  .qr-box{
+  width:120px;
+  text-align:center;
+  position:absolute;
+  left:50%; /* center QR horizontally */
+  transform:translateX(-50%);
+  bottom:96px; /* lift QR up to avoid overlap */
+  pointer-events:auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.auth-sig{
+  margin-top:0;
+  font-size:14px;
+  color:#334155;
+}
+
+/* STAMP */
+.cert-stamp{
+  position:absolute;
+  right:120px;
+  bottom:110px;
+  width:120px;
+  transform:rotate(-12deg);
+  z-index:4;
+  pointer-events:none;
+}
+
+/* Controls (export/print) */
+.controls{
+  width:1000px;
+  margin:12px auto 24px;
+  text-align:center;
+}
+.controls button{
+  background:#1e3a8a;
+  color:#fff;
+  border:none;
+  padding:8px 14px;
+  margin:0 8px;
+  border-radius:6px;
+  cursor:pointer;
+  font-family:Inter;
+  font-size:14px;
+}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:9999}
+.modal{background:#fff;padding:18px;border-radius:8px;min-width:320px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.modal h4{margin:0 0 12px}
+.modal .opts{display:flex;gap:10px;justify-content:center}
+.modal .opts button{background:#111827;color:#fff;padding:8px 12px;border:none;border-radius:6px;cursor:pointer}
+
+/* PRINT */
+@media print{
+  .certificate{margin:0;box-shadow:none}
+  .controls, .modal-backdrop{display:none !important}
+  /* request browsers to print background images/colors when possible */
+  .certificate, .frame{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="certificate">
+
+  <div class="watermark"></div>
+  <div class="frame"></div>
+  <img src="img/certified.png" class="cert-stamp">
+
+  <div class="safe-content">
+
+    <!-- HEADER -->
+    <div class="header">
+      <img src="img/logo.png" alt="CodeTech Logo">
+      <img src="img/partner.png" alt="Partner Logo">
+    </div>
+
+    <!-- CENTER BLOCK -->
+    <div>
+      <div class="platform">
+        <h1>CODETECH INTERNSHIP</h1>
+        <h3>Certificate of Internship</h3>
+      </div>
+
+      <div class="content">
+        This is to certify that
+        <div class="name" id="studentName"></div>
+        has successfully completed the internship in  
+        <b id="domain"></b><br>
+        from <b id="fromDate"></b> to <b id="toDate"></b><br>
+        under the <b>CodeTech Internship Program</b>.
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+
+      <div class="sign">
+        <img src="img/ceo-sign.png" alt="CEO Signature">
+        <p><b>CEO, CodeTech</b></p>
+      </div>
+
+      <div class="qr-box">
+        <div id="qrcode"></div>
+        <div class="cert-id"><b id="certId"></b></div>
+      </div>
+
+      <div class="sign">
+        <img src="img/ceo-sign.png" alt="Authorized Signature">
+        <p class="auth-sig"><b>Authorized Signature</b></p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- Export / Print Controls -->
+<div class="controls">
+  <button id="exportBtn">Export</button>
+  <button id="printBtn">Print</button>
+</div>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="exportModal">
+  <div class="modal">
+    <h4>Export certificate</h4>
+    <div class="opts">
+      <button id="savePng">Download PNG</button>
+      <button id="savePdf">Download PDF</button>
+      <button id="closeModal">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const student={
+  name:"SHUBHAM KUMAR JHA",
+  domain:"Web Development",
+  from:"01 Jan 2026",
+  to:"31 Mar 2026",
+  certId:"CODETECH-INT-"+Math.floor(100000+Math.random()*900000)
+};
+
+studentName.innerText=student.name;
+domain.innerText=student.domain;
+fromDate.innerText=student.from;
+toDate.innerText=student.to;
+certId.innerText=student.certId;
+
+new QRCode("qrcode",{
+  text:"https://codetech.com/verify?cert="+student.certId,
+  width:96,
+  height:96,
+  correctLevel:QRCode.CorrectLevel.H
+});
+
+// place watermark (logo) at a random position inside the certificate
+function placeRandomWatermark(size=120, padding=12){
+  const wm = document.querySelector('.watermark');
+  const cert = document.querySelector('.certificate');
+  if(!wm || !cert) return;
+  const cw = cert.clientWidth;
+  const ch = cert.clientHeight;
+  const w = Math.min(size, Math.max(40, cw - padding*2));
+  const h = w; // keep square
+  const maxX = Math.max(0, cw - w - padding);
+  const maxY = Math.max(0, ch - h - padding);
+  const x = Math.floor(padding + Math.random() * maxX);
+  const y = Math.floor(padding + Math.random() * maxY);
+  wm.style.backgroundSize = w + 'px';
+  wm.style.backgroundPosition = x + 'px ' + y + 'px';
+}
+
+// ensure watermark is placed on load
+window.addEventListener('load', ()=>placeRandomWatermark());
+
+// Export / Print handlers
+const exportBtn = document.getElementById('exportBtn');
+const printBtn = document.getElementById('printBtn');
+const exportModal = document.getElementById('exportModal');
+const savePng = document.getElementById('savePng');
+const savePdf = document.getElementById('savePdf');
+const closeModal = document.getElementById('closeModal');
+
+exportBtn.addEventListener('click', ()=>{ exportModal.style.display='flex'; });
+closeModal.addEventListener('click', ()=>{ exportModal.style.display='none'; });
+
+printBtn.addEventListener('click', ()=>{ window.print(); });
+
+function captureCertificate(scale=2){
+  // randomize watermark placement just before capture/export
+  placeRandomWatermark();
+  const el = document.querySelector('.certificate');
+  return html2canvas(el, {scale:scale, useCORS:true, backgroundColor: null});
+}
+
+savePng.addEventListener('click', ()=>{
+  savePng.disabled = true;
+  captureCertificate(2).then(canvas=>{
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = student.certId + '.png';
+    link.click();
+    exportModal.style.display='none';
+    savePng.disabled = false;
+  }).catch(()=>{ savePng.disabled = false; exportModal.style.display='none'; });
+});
+
+savePdf.addEventListener('click', ()=>{
+  savePdf.disabled = true;
+  captureCertificate(2).then(canvas=>{
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.save(student.certId + '.pdf');
+    exportModal.style.display='none';
+    savePdf.disabled = false;
+  }).catch(()=>{ savePdf.disabled = false; exportModal.style.display='none'; });
+});
+</script>
+
+</body>
+</html>
