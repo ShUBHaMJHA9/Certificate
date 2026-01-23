@@ -21,8 +21,8 @@ body{
 
 /* CERTIFICATE */
 .certificate{
-  width:1000px;
-  height:700px;
+  width:900px;
+  height:600px;
   margin:40px auto;
   position:relative;
   background:
@@ -136,15 +136,15 @@ body{
 
 .sign img{height:44px; pointer-events:auto; display:block; align-self:center}
 /* left-align the CEO signature image so it lines up with the text */
-.footer .sign:first-child img{ align-self:flex-start; margin-left:6px }
+.footer .sign:first-child img{ align-self:flex-start; margin-left:1px }
 
 /* position signature blocks absolutely and stack image above label */
 .footer .sign{
   position:absolute;
-  bottom:40px;
+  bottom:10px;
   display:flex;
   flex-direction:column;
-  gap:6px;
+  gap:1px;
   align-items:center;
   pointer-events:auto;
 }
@@ -164,8 +164,8 @@ body{
 /* CEO signature: place near bottom-left corner */
 .footer .sign:first-child{
   position:absolute;
-  left:4px; /* move CEO block very close to left edge */
-  bottom:72px; /* move signatures up more */
+  left:0px; /* move CEO block slightly more to the left */
+  bottom:48px; /* move CEO signature a bit lower */
   width:200px;
   text-align:left;
   pointer-events:auto;
@@ -189,13 +189,13 @@ body{
 
 /* QR */
 .qr-box{
-  width:150px;
+  width:96px;
   text-align:center;
 }
 
 #qrcode canvas{
-  width:96px!important;
-  height:96px!important;
+  width:72px!important;
+  height:72px!important;
   background:#fff;
   box-shadow:0 6px 14px rgba(0,0,0,.12);
   image-rendering:pixelated;
@@ -209,12 +209,12 @@ body{
 }
 
   .qr-box{
-  width:120px;
+  width:96px;
   text-align:center;
   position:absolute;
   left:50%; /* center QR horizontally */
   transform:translateX(-50%);
-  bottom:96px; /* lift QR up to avoid overlap */
+  bottom:30px; /* move QR down to match new certificate size */
   pointer-events:auto;
   display:flex;
   flex-direction:column;
@@ -319,7 +319,7 @@ body{
       </div>
 
       <div class="sign">
-        <img src="img/ceo-sign.png" alt="Authorized Signature">
+        <!-- <img src="img/ceo-sig.png" alt="Authorized Signature"> -->
         <p class="auth-sig"><b>Authorized Signature</b></p>
       </div>
 
@@ -363,8 +363,8 @@ certId.innerText=student.certId;
 
 new QRCode("qrcode",{
   text:"https://codetech.com/verify?cert="+student.certId,
-  width:96,
-  height:96,
+  width:72,
+  height:72,
   correctLevel:QRCode.CorrectLevel.H
 });
 
